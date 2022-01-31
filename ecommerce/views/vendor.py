@@ -120,7 +120,7 @@ class VendorEditItems(UpdateView):
             item.save()
         return redirect('ecommerce:vendor_dashboard')
 
-
+@method_decorator([login_required, vendor_required()], name='dispatch')
 class VendorViewOrders(ListView):
     model = Order
     template_name = 'ecommerce/vendor/received_orders.html'
@@ -138,7 +138,7 @@ class VendorViewOrders(ListView):
         }
         return context
 
-
+@method_decorator([login_required, vendor_required()], name='dispatch')
 def vendor_order_generate_csv(request):
     wb = Workbook()
     sheet = wb.add_sheet('Sheet 1')
