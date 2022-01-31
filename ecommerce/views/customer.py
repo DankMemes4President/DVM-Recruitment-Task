@@ -314,6 +314,7 @@ class CustomerItemReview(CreateView):
         return redirect('ecommerce:customer_item_details')
 
 
+@method_decorator([login_required, customer_required()], name='dispatch')
 class CustomerViewPrevOrders(ListView):
     model = Order
     template_name = 'ecommerce/customer/view_orders.html'
@@ -333,6 +334,7 @@ class CustomerViewPrevOrders(ListView):
         return context
 
 
+@method_decorator([login_required, customer_required()], name='dispatch')
 class CustomerShippingAddress(CreateView):
     model = ShippingAddress
     template_name = 'ecommerce/customer/address.html'
@@ -356,6 +358,7 @@ class CustomerShippingAddress(CreateView):
         return redirect('ecommerce:customer_dashboard')
 
 
+@method_decorator([login_required, customer_required()], name='dispatch')
 class CustomerWishList(ListView):
     model = WishList
     template_name = 'ecommerce/customer/wishlist.html'
