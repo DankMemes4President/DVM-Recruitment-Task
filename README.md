@@ -1,3 +1,7 @@
+# Notes from me
+Site is available at http://localhost:8000/ecommerce if you're deplyoing locally
+
+
 # DVM-Recruitment-Task
 # Ecommerce App
 A basic online marketplace. Make sure you go through UX suggestions below before starting.
