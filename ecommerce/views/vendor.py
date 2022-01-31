@@ -138,7 +138,9 @@ class VendorViewOrders(ListView):
         }
         return context
 
-@method_decorator([login_required, vendor_required()], name='dispatch')
+
+@login_required
+@vendor_required
 def vendor_order_generate_csv(request):
     wb = Workbook()
     sheet = wb.add_sheet('Sheet 1')
