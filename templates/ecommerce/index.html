@@ -24,7 +24,16 @@
             </div>
         </div>
     </header>
-    <div align="center">
+
+    <div>
+        {% for message in messages %}
+            <div class="alert {{ message.tags }}" role="alert">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+
+    <div class="container text-center">
         <br>
         <br>
         <a href="{% url 'vendor_login' %}">

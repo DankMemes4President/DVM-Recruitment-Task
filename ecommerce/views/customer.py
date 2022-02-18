@@ -7,7 +7,6 @@ from django.shortcuts import redirect, reverse
 from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.views.generic import CreateView, ListView, View, UpdateView
-
 from ..decorators import customer_required
 from ..forms import CustomerSignUpForm, AddItemToCart, AddMoney, AddReview, AddShippingAddress
 from ..models import User, Customer, Item, Vendor, Cart, Review, Order, ShippingAddress, OrderedItems, WishList
@@ -37,7 +36,7 @@ def customer_login(request):
             user = authenticate(username=username, password=password)
             if user is not None:
                 login(request, user, backend='django.contrib.auth.backends.ModelBackend')
-                messages.info(request, f"You are now logged in as {username}.")
+                messages.success(request, f"You are now logged in as {username}.")
                 return redirect("ecommerce:customer_dashboard")
             else:
                 messages.error(request, "Invalid username or password")

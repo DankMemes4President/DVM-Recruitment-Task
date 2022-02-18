@@ -22,8 +22,17 @@
         </div>
     </header>
     <title>Customer Login</title>
-    <div class="col-md-4 offset-md-4">
+    <div class="container w-25">
         <br>
+
+        <div>
+            {% for message in messages %}
+                <div class="alert {{ message.tags }}" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+
         <form method="POST">
             {% csrf_token %}
             {{ form|crispy }}
