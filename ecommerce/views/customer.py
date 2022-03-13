@@ -8,9 +8,11 @@ from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.views.generic import CreateView, ListView, View, UpdateView
 from ..decorators import customer_required
-from ..forms import CustomerSignUpForm, AddItemToCart, AddMoney, AddReview, AddShippingAddress
+from ..forms import CustomerSignUpForm, AddItemToCart, AddMoney, AddReview, AddShippingAddress, AddressSelection
 from ..models import User, Customer, Item, Vendor, Cart, Review, Order, ShippingAddress, OrderedItems, WishList
 from DVM_task3.keyconfig import sendgrid_sender_email
+from django.views.generic.edit import FormMixin
+
 
 class CustomerSignUpView(CreateView):
     model = User
@@ -157,9 +159,15 @@ class CustomerAddMoney(UpdateView):
 
 
 @method_decorator([login_required, customer_required()], name='dispatch')
-class CustomerCart(ListView):
+class CustomerCart(ListView, FormMixin):
     model = Cart
     template_name = 'ecommerce/customer/cart.html'
+    form_class = AddressSelection
+
+    def get_form_kwargs(self):
+        kwargs = super(CustomerCart, self).get_form_kwargs()
+        kwargs['request'] = self.request
+        return kwargs
 
     def get_queryset(self):
         user = self.request.user
@@ -169,14 +177,20 @@ class CustomerCart(ListView):
         vendors = Vendor.objects.all()
         cart_items = customer.cart_set.all()
         cart_total = 0
+        cart_total_items = 0
         for it in cart_items:
             cart_total += it.total_cost
+            cart_total_items += 1
+
+        # address_selected = AddressSelection()
         queryset = {
             'items': items,
             'customer': customer,
             'balance': balance,
             'vendors': vendors,
             'cart_total': cart_total,
+            'cart_total_items': cart_total_items,
+            # 'address_selected': address_selected,
         }
         return queryset
 
@@ -184,7 +198,13 @@ class CustomerCart(ListView):
         customer = self.request.user.customer
         money = customer.money
         cart_items = customer.cart_set.all()
-        order = Order.objects.create(customer=customer)
+        address_id = request.POST['address_title']
+        if customer.shippingaddress_set.filter(id=address_id).exists():
+            address = customer.shippingaddress_set.filter(id=address_id)[0].address
+            order = Order.objects.create(customer=customer, address=address)
+        else:
+            messages.error(request, f"You did not select and Address. Please select or create a new one.")
+            redirect('ecommerce:customer_shipping_address')
         vendors = []
         for cart in cart_items:
             item = Item.objects.get(item_name=cart.items)
@@ -211,7 +231,7 @@ class CustomerCart(ListView):
                 return redirect('ecommerce:customer_cart')
 
         for vendor in vendors:
-            inventory = []
+            inventory = [f'{order.address}']
             for key, elem in enumerate(order.ordereditems_set.all()):
                 if elem.vendor == vendor:
                     inventory.append(f'{elem.item_name} : {elem.item_quantity} @ {elem.total_cost}')
@@ -352,8 +372,9 @@ class CustomerShippingAddress(CreateView):
         return context
 
     def post(self, request, *args, **kwargs):
+        address_title = request.POST['address_title']
         address = request.POST['address']
-        ShippingAddress.objects.create(customer_id=self.request.user.id, address=address)
+        ShippingAddress.objects.create(customer_id=self.request.user.id, address=address, address_title=address_title)
         return redirect('ecommerce:customer_dashboard')
 
 

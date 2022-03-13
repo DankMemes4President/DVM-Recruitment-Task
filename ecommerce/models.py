@@ -69,19 +69,22 @@ class Cart(models.Model):
     total_cost = models.FloatField(default=0)
 
 
-# TODO: Running into problems where if a vendor deletes an item that has already been ordered, the order disappears
-# FIX: Make another class for ordered items and link it to the order with a foreign key
+class ShippingAddress(models.Model):
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    address_title = models.CharField(max_length=500)
+    address = models.TextField()
+
+    def __str__(self):
+        return self.address_title
+
+
 class Order(models.Model):
 
     def __str__(self):
         return self.id
 
-    # vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE)
-    # vendor = models.ManyToManyField(Vendor)
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
-    # customer = models.ManyToManyField(Customer)
-    # item = models.ForeignKey(Item, on_delete=models.CASCADE)
-    # quantity = models.PositiveIntegerField()
+    address = models.TextField(null=False)
     total_cost = models.FloatField(default=0)
 
 
@@ -99,11 +102,6 @@ class OrderedItems(models.Model):
     item_quantity = models.PositiveIntegerField()
     item_cost = models.FloatField(default=0, validators=[MinValueValidator(0.0)])
     total_cost = models.FloatField()
-
-
-class ShippingAddress(models.Model):
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
-    address = models.TextField()
 
 
 class WishList(models.Model):

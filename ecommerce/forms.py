@@ -62,4 +62,17 @@ class AddReview(forms.ModelForm):
 class AddShippingAddress(forms.ModelForm):
     class Meta:
         model = ShippingAddress
-        fields = ['address']
+        fields = ['address_title', 'address']
+
+
+class AddressSelection(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop('request')
+        super(AddressSelection, self).__init__(*args, **kwargs)
+        self.fields['address_title'].queryset = ShippingAddress.objects.filter(customer__user=self.request.user)
+
+    class Meta:
+        model = ShippingAddress
+        fields = ['address_title']
+
+    address_title = forms.ModelChoiceField(queryset=None, widget=forms.Select)
