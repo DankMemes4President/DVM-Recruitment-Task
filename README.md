@@ -1,6 +1,6 @@
 # Notes from me
 Site is available at http://localhost:8000/ecommerce if you're deploying locally
-https://ecommercesiteproject.tk/ecommerce/ publically hosted site
+<br />https://ecommercesiteproject.tk/ecommerce/ publically hosted site
 
 
 # DVM-Recruitment-Task
