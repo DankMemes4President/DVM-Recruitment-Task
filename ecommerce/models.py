@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from PIL import Image
 
 
 class User(AbstractUser):
@@ -16,6 +17,10 @@ class Vendor(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
 
 
+def upload_to_vendor_dir(instance, filename):
+    return f"{instance.vendor.user.username}/{filename}"
+
+
 class Item(models.Model):
 
     def __str__(self):
@@ -24,12 +29,21 @@ class Item(models.Model):
 
     vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE)
     item_name = models.CharField(max_length=256)
-    item_image = models.ImageField()
+    item_image = models.ImageField(upload_to=upload_to_vendor_dir)
     item_description = models.TextField()
     item_quantity = models.PositiveIntegerField()
     item_cost = models.FloatField(default=0, validators=[MinValueValidator(0.0)])
     total_cost = models.FloatField()
     units_sold = models.PositiveIntegerField(default=0)
+
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None):
+        super(Item, self).save()
+        img = Image.open(self.item_image.path)
+        if img.height > 500 or img.width > 500:
+            output_size = (500, 500)
+            img.thumbnail(output_size)
+            img.save(self.item_image.path)
 
 
 class Review(models.Model):

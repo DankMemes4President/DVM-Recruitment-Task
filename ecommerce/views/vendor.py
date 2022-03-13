@@ -120,6 +120,7 @@ class VendorEditItems(UpdateView):
             item.save()
         return redirect('ecommerce:vendor_dashboard')
 
+
 @method_decorator([login_required, vendor_required()], name='dispatch')
 class VendorViewOrders(ListView):
     model = Order
